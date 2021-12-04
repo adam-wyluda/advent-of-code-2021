@@ -57,7 +57,7 @@ fn find_rating<'a>(
     }
 
     assert_eq!(output.len(), 1, "There should only be a single result");
-    return output[0];
+    output[0]
 }
 
 fn limit_ratings<'a>(
