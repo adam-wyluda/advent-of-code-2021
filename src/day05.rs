@@ -25,7 +25,6 @@ impl Default for Area {
 
 impl Area {
     fn mark(&mut self, line: &Line) {
-        // For the first part of the task, only horizontal and vertical lines will be marked
         if line.x1 == line.x2 {
             let x = line.x1 as usize;
             let low = min(line.y1, line.y2) as usize;
@@ -41,6 +40,26 @@ impl Area {
 
             for x in low..=high {
                 self.points[y][x] += 1;
+            }
+        } else {
+            let low_y = min(line.y1, line.y2) as usize;
+            let high_y = max(line.y1, line.y2) as usize;
+
+            let low_x = min(line.x1, line.x2) as usize;
+            let high_x = max(line.x1, line.x2) as usize;
+
+            assert_eq!(high_y - low_y, high_x - low_x, "The line must be diagonal");
+
+            let length = high_y - low_y;
+
+            if (line.y1 < line.y2) == (line.x1 < line.x2) {
+                for r in 0..=length {
+                    self.points[low_y + r][low_x + r] += 1;
+                }
+            } else {
+                for r in 0..=length {
+                    self.points[high_y - r][low_x + r] += 1;
+                }
             }
         }
     }
