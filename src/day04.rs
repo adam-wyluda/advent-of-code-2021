@@ -58,7 +58,7 @@ impl Board {
 }
 
 fn main() -> io::Result<()> {
-    let file = File::open("input-4-2.txt")?;
+    let file = File::open("input/input-4-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());
 

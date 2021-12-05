@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
 fn main() -> io::Result<()> {
-    let file = File::open("input-2-2.txt")?;
+    let file = File::open("input/input-2-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter();
 
@@ -34,7 +34,7 @@ fn main() -> io::Result<()> {
 }
 
 fn main_first() -> io::Result<()> {
-    let file = File::open("input-2-2.txt")?;
+    let file = File::open("input/input-2-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter();
 
