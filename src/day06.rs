@@ -5,27 +5,33 @@ const DAYS: usize = 256;
 type Memory = [[u64; 9]; DAYS + 1];
 
 // Part 1.
-fn calculate_naive(s: u64, n: u64) -> u64 {
-    if n == 0 {
+fn calculate_population_naive(state: u64, days_left: u64) -> u64 {
+    if days_left == 0 {
         1
-    } else if s == 0 {
-        calculate_naive(6, n - 1) + calculate_naive(8, n - 1)
+    } else if state == 0 {
+        calculate_population_naive(6, days_left - 1) + calculate_population_naive(8, days_left - 1)
     } else {
-        calculate_naive(s - 1, n - 1)
+        calculate_population_naive(state - 1, days_left - 1)
     }
 }
 
 // Part 2.
-fn calculate_memoize(memory: &mut Memory, s: u64, n: u64) -> u64 {
-    if memory[n as usize][s as usize] == 0 {
-        memory[n as usize][s as usize] = match (s, n) {
+fn calculate_population_memoize(memory: &mut Memory, state: u64, days_left: u64) -> u64 {
+    let mut memoized_value = memory[days_left as usize][state as usize];
+
+    if memoized_value == 0 {
+        memoized_value = match (state, days_left) {
             (_, 0) => 1,
-            (0, _) => calculate_memoize(memory, 6, n - 1) + calculate_memoize(memory, 8, n - 1),
-            (_, _) => calculate_memoize(memory, s - 1, n - 1),
+            (0, _) => {
+                calculate_population_memoize(memory, 6, days_left - 1)
+                    + calculate_population_memoize(memory, 8, days_left - 1)
+            }
+            (_, _) => calculate_population_memoize(memory, state - 1, days_left - 1),
         };
+        memory[days_left as usize][state as usize] = memoized_value;
     }
 
-    memory[n as usize][s as usize]
+    memoized_value
 }
 
 fn main() -> io::Result<()> {
@@ -33,13 +39,15 @@ fn main() -> io::Result<()> {
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());
 
+    let memory = &mut [[0; 9]; DAYS + 1];
+
     let initial_states: u64 = lines
         .next()
         .unwrap()
         .split(",")
         .map(|s| s.parse::<u64>().unwrap())
-        // .map(|s| calculate_naive(s, DAYS as u32))
-        .map(|s| calculate_memoize(&mut [[0; 9]; DAYS + 1], s, DAYS as u64))
+        // .map(|s| calculate_naive(s, DAYS as u64))
+        .map(|s| calculate_population_memoize(memory, s, DAYS as u64))
         .sum();
 
     println!("The result is: {}", initial_states);
