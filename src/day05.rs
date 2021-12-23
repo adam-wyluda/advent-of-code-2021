@@ -79,7 +79,7 @@ impl Area {
     }
 }
 
-fn main() -> io::Result<()> {
+pub fn main() -> io::Result<()> {
     let file = File::open("input/input-5-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter().map(|l| l.unwrap());

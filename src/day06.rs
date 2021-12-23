@@ -5,6 +5,7 @@ const DAYS: usize = 256;
 type Memory = [[u64; 9]; DAYS + 1];
 
 // Part 1.
+#[allow(dead_code)]
 fn calculate_population_naive(state: u64, days_left: u64) -> u64 {
     if days_left == 0 {
         1
@@ -34,7 +35,7 @@ fn calculate_population_memoize(memory: &mut Memory, state: u64, days_left: u64)
     memoized_value
 }
 
-fn main() -> io::Result<()> {
+pub fn main() -> io::Result<()> {
     let file = File::open("input/input-6-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());

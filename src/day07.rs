@@ -3,7 +3,12 @@ use std::io::{self, prelude::*, BufReader};
 
 const MAX_DISTANCE: usize = 2000;
 
-fn main() -> io::Result<()> {
+pub fn main() -> io::Result<()> {
+    println!("Hello!");
+    Ok(())
+}
+
+pub fn main_first() -> io::Result<()> {
     let file = File::open("input/input-7-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());

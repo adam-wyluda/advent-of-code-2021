@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{self, prelude::*, BufReader};
 
-fn main() -> io::Result<()> {
+pub fn main() -> io::Result<()> {
     let file = File::open("input/input-1-2.txt")?;
     let reader = BufReader::new(file);
 
@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn main_first() -> io::Result<()> {
+pub fn main_first() -> io::Result<()> {
     let file = File::open("input/input-1-2.txt")?;
     let reader = BufReader::new(file);
 
