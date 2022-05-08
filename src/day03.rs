@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 use std::str;
@@ -11,8 +11,8 @@ pub fn main() -> Result<()> {
     let reader = BufReader::new(file);
     let lines = reader
         .lines()
-        .map(|res| res.unwrap())
-        .collect::<Vec<String>>();
+        .map(|res| res.context("An error occurred when reading line"))
+        .collect::<Result<Vec<String>>>()?;
 
     // Reuse two buffers to avoid allocations in find_rating()
     let mut buffer_a = Vec::with_capacity(lines.len());
@@ -21,8 +21,8 @@ pub fn main() -> Result<()> {
     let oxygen_rating = find_rating(&lines, &mut buffer_a, &mut buffer_b, true);
     let co2_rating = find_rating(&lines, &mut buffer_a, &mut buffer_b, false);
 
-    let oxygen_rating = isize::from_str_radix(str::from_utf8(oxygen_rating).unwrap(), 2).unwrap();
-    let co2_rating = isize::from_str_radix(str::from_utf8(co2_rating).unwrap(), 2).unwrap();
+    let oxygen_rating = isize::from_str_radix(str::from_utf8(oxygen_rating)?, 2)?;
+    let co2_rating = isize::from_str_radix(str::from_utf8(co2_rating)?, 2)?;
 
     println!("The result is: {}", oxygen_rating * co2_rating);
 

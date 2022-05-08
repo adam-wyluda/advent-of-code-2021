@@ -15,7 +15,7 @@ pub fn main() -> Result<()> {
         let line = line?;
         let split = line.split(" ").collect::<Vec<&str>>();
         let command = split[0];
-        let value = split[1].parse::<i32>().unwrap();
+        let value = split[1].parse::<i32>()?;
 
         let (diff_x, diff_y, diff_aim) = match command {
             "forward" => (value, value * aim, 0),
@@ -46,7 +46,7 @@ pub fn main_first() -> Result<()> {
         let line = line?;
         let split = line.split(" ").collect::<Vec<&str>>();
         let command = split[0];
-        let value = split[1].parse::<i32>().unwrap();
+        let value = split[1].parse::<i32>()?;
 
         let (diff_x, diff_y) = match command {
             "forward" => (value, 0),

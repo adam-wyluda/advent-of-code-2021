@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
@@ -63,8 +63,8 @@ pub fn main() -> Result<()> {
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());
 
-    let numbers = read_numbers(&lines.next().unwrap());
-    let mut boards = read_boards(&mut lines);
+    let numbers = read_numbers(&lines.next().context("Missing first line")?)?;
+    let mut boards = read_boards(&mut lines)?;
 
     for number in numbers {
         println!("[ {} ]", number);
@@ -87,41 +87,41 @@ pub fn main() -> Result<()> {
     Ok(())
 }
 
-fn read_numbers(line: &String) -> Vec<u8> {
+fn read_numbers(line: &String) -> Result<Vec<u8>> {
     line.split(",")
-        .map(|s| s.parse::<u8>().unwrap())
-        .collect::<Vec<u8>>()
+        .map(|s| s.parse::<u8>().context("Couldn't parse number as u8"))
+        .collect::<Result<Vec<u8>>>()
 }
 
-fn read_boards(lines: &mut dyn Iterator<Item = String>) -> Vec<Board> {
+fn read_boards(lines: &mut dyn Iterator<Item = String>) -> Result<Vec<Board>> {
     let mut result = Vec::new();
 
-    while let Some(board) = read_board(lines) {
+    while let Some(board) = read_board(lines)? {
         result.push(board);
     }
 
-    result
+    Ok(result)
 }
 
-fn read_board(lines: &mut dyn Iterator<Item = String>) -> Option<Board> {
+fn read_board(lines: &mut dyn Iterator<Item = String>) -> Result<Option<Board>> {
     // Ignore first empty line
     if lines.next().is_none() {
-        return None;
+        return Ok(None);
     }
 
     let mut result = Board::default();
 
     for row in 0..5 {
-        let line = lines.next().unwrap();
+        let line = lines.next().context("")?;
         let numbers = line
             .split(" ")
             .filter(|s| !s.is_empty())
-            .map(|s| s.parse::<u8>().unwrap());
+            .map(|s| s.parse::<u8>().context("Couldn't parse number"));
 
         for (i, number) in numbers.enumerate() {
-            result.numbers[row][i] = number;
+            result.numbers[row][i] = number?;
         }
     }
 
-    Some(result)
+    Ok(Some(result))
 }

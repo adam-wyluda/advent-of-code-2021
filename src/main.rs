@@ -10,11 +10,18 @@ pub mod day08;
 use anyhow::Result;
 
 fn main() -> Result<()> {
+    println!("===== Day 01 =====");
     day01::main()?;
+    println!("\n===== Day 02 =====");
     day02::main()?;
+    println!("\n===== Day 03 =====");
     day03::main()?;
+    println!("\n===== Day 04 =====");
     day04::main()?;
+    println!("\n===== Day 05 =====");
     day05::main()?;
+    println!("\n===== Day 06 =====");
     day06::main()?;
-    day07::main()
+    println!("\n===== Day 07 =====");
+    day07::main_first()
 }

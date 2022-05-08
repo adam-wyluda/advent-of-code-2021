@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::cmp::{max, min};
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
@@ -85,7 +85,7 @@ pub fn main() -> Result<()> {
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter().map(|l| l.unwrap());
 
-    let lines = lines.map(read_line).collect::<Vec<Line>>();
+    let lines = lines.map(read_line).collect::<Result<Vec<Line>>>()?;
     let mut area = Area::default();
 
     for line in lines {
@@ -99,24 +99,24 @@ pub fn main() -> Result<()> {
     Ok(())
 }
 
-fn read_line(string: String) -> Line {
+fn read_line(string: String) -> Result<Line> {
     let mut split = string.split(" -> ");
 
-    let mut point1 = split.next().unwrap().split(",");
-    let mut point2 = split.next().unwrap().split(",");
+    let mut point1 = split.next().context("Missing point1")?.split(",");
+    let mut point2 = split.next().context("Missing point2")?.split(",");
 
-    let x1 = point1.next().unwrap();
-    let y1 = point1.next().unwrap();
+    let x1 = point1.next().context("Missing x1")?;
+    let y1 = point1.next().context("Missing y1")?;
 
-    let x2 = point2.next().unwrap();
-    let y2 = point2.next().unwrap();
+    let x2 = point2.next().context("Missing x2")?;
+    let y2 = point2.next().context("Missing y2")?;
 
-    Line {
-        x1: x1.parse::<u16>().unwrap(),
-        y1: y1.parse::<u16>().unwrap(),
-        x2: x2.parse::<u16>().unwrap(),
-        y2: y2.parse::<u16>().unwrap(),
-    }
+    Ok(Line {
+        x1: x1.parse::<u16>().context("Couldn't parse x1")?,
+        y1: y1.parse::<u16>().context("Couldn't parse y1")?,
+        x2: x2.parse::<u16>().context("Couldn't parse x2")?,
+        y2: y2.parse::<u16>().context("Couldn't parse y2")?,
+    })
 }
 
 fn print_area(area: &Area) {

@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
@@ -45,7 +45,7 @@ pub fn main() -> Result<()> {
 
     let initial_states: u64 = lines
         .next()
-        .unwrap()
+        .context("Missing first line")?
         .split(",")
         .map(|s| s.parse::<u64>().unwrap())
         // .map(|s| calculate_naive(s, DAYS as u64))
