@@ -23,5 +23,7 @@ fn main() -> Result<()> {
     println!("\n===== Day 06 =====");
     day06::main()?;
     println!("\n===== Day 07 =====");
-    day07::main_first()
+    day07::main_first();
+    println!("\n===== Day 08 =====");
+    day08::main()
 }

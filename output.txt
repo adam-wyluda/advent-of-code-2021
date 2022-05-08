@@ -1317,3 +1317,6 @@ The result is: 1702631502303
 
 ===== Day 07 =====
 The result is: 341534
+
+===== Day 08 =====
+The answer is: 301
