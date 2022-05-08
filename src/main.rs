@@ -5,9 +5,16 @@ pub mod day04;
 pub mod day05;
 pub mod day06;
 pub mod day07;
+pub mod day08;
 
-use std::io;
+use anyhow::Result;
 
-fn main() -> io::Result<()> {
-    self::day07::main_first()
+fn main() -> Result<()> {
+    day01::main()?;
+    day02::main()?;
+    day03::main()?;
+    day04::main()?;
+    day05::main()?;
+    day06::main()?;
+    day07::main()
 }

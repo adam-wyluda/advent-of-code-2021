@@ -1,6 +1,7 @@
+use anyhow::Result;
 use std::cmp::{max, min};
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 const AREA_SIZE: usize = 1000;
 
@@ -79,7 +80,7 @@ impl Area {
     }
 }
 
-pub fn main() -> io::Result<()> {
+pub fn main() -> Result<()> {
     let file = File::open("input/input-5-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter().map(|l| l.unwrap());

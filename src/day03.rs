@@ -1,11 +1,12 @@
+use anyhow::Result;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 use std::str;
 
 const U8_ASCII_1: u8 = '1' as u8;
 const U8_ASCII_0: u8 = '0' as u8;
 
-pub fn main() -> io::Result<()> {
+pub fn main() -> Result<()> {
     let file = File::open("input/input-3-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader
@@ -97,7 +98,7 @@ fn limit_ratings<'a>(
 
 // -------------------------------------------------------
 
-pub fn main_first() -> io::Result<()> {
+pub fn main_first() -> Result<()> {
     let file = File::open("input/input-3-2.txt")?;
     let reader = BufReader::new(file);
     let lines = reader.lines().into_iter();

@@ -1,14 +1,15 @@
+use anyhow::Result;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 const MAX_DISTANCE: usize = 2000;
 
-pub fn main() -> io::Result<()> {
-    println!("Hello!");
+pub fn main() -> Result<()> {
+    println!("TODO");
     Ok(())
 }
 
-pub fn main_first() -> io::Result<()> {
+pub fn main_first() -> Result<()> {
     let file = File::open("input/input-7-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());

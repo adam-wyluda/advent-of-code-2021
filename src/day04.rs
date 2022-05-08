@@ -1,5 +1,6 @@
+use anyhow::Result;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 #[derive(Default, Debug)]
 struct Board {
@@ -57,7 +58,7 @@ impl Board {
     }
 }
 
-pub fn main() -> io::Result<()> {
+pub fn main() -> Result<()> {
     let file = File::open("input/input-4-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());

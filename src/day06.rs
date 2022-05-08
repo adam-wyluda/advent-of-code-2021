@@ -1,5 +1,6 @@
+use anyhow::Result;
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 const DAYS: usize = 256;
 type Memory = [[u64; 9]; DAYS + 1];
@@ -35,7 +36,7 @@ fn calculate_population_memoize(memory: &mut Memory, state: u64, days_left: u64)
     memoized_value
 }
 
-pub fn main() -> io::Result<()> {
+pub fn main() -> Result<()> {
     let file = File::open("input/input-6-2.txt")?;
     let reader = BufReader::new(file);
     let mut lines = reader.lines().into_iter().map(|l| l.unwrap());
