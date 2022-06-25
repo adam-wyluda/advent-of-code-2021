@@ -8,6 +8,26 @@ struct SegmentDisplay {
 }
 
 impl SegmentDisplay {
+    fn from_positions(positions: Vec<usize>) -> SegmentDisplay {
+        let mut segments_on = [false; 7];
+
+        for position in positions {
+            segments_on[position] = true;
+        }
+
+        SegmentDisplay { segments_on }
+    }
+
+    fn from_position_negative(positions: Vec<usize>) -> SegmentDisplay {
+        let mut segments_on = [true; 7];
+
+        for position in positions {
+            segments_on[position] = false;
+        }
+
+        SegmentDisplay { segments_on }
+    }
+
     fn len(&self) -> usize {
         self.segments_on.iter().filter(|s| **s).count()
     }
@@ -26,6 +46,35 @@ impl SegmentDisplay {
             [true, true, true, true, false, true, true] => 9,
             _ => panic!("Unrecognized digit: {:?}", self.segments_on),
         }
+    }
+
+    fn find_different_segment(&self, other: &SegmentDisplay) -> Option<usize> {
+        self.segments_on
+            .iter()
+            .zip(other.segments_on.iter())
+            .position(|(a, b)| a != b)
+    }
+
+    fn remaining_segment(&self, positions: Vec<usize>) -> Option<usize> {
+        self.segments_on
+            .iter()
+            .enumerate()
+            .find(|r| !positions.contains(&r.0) && *r.1)
+            .iter()
+            .map(|r| r.0)
+            .last()
+    }
+
+    fn common_segments(&self, other: &SegmentDisplay) -> Vec<usize> {
+        let mut result = Vec::with_capacity(7);
+
+        for i in 0..6 {
+            if self.segments_on[i] == other.segments_on[i] {
+                result.push(i);
+            }
+        }
+
+        result
     }
 }
 
@@ -51,6 +100,7 @@ impl From<&str> for SegmentDisplay {
     }
 }
 
+#[derive(Debug)]
 struct SegmentDisplayTransform {
     segment_mapping: [usize; 7],
 }
@@ -66,6 +116,14 @@ impl SegmentDisplayTransform {
 }
 
 fn infer_transform(samples: Vec<SegmentDisplay>) -> SegmentDisplayTransform {
+    //  aaaa
+    // b    c
+    // b    c
+    //  dddd
+    // e    f
+    // e    f
+    //  gggg
+
     // Number of segments per digit:
     // 0 - 6
     // 1 - 2
@@ -109,17 +167,85 @@ fn infer_transform(samples: Vec<SegmentDisplay>) -> SegmentDisplayTransform {
         segment_list.push(sample);
     }
 
-    let mut result = SegmentDisplayTransform {
-        segment_mapping: [0; 7],
-    };
+    let digit_1 = *segments_2.first().unwrap();
+    let digit_4 = *segments_4.first().unwrap();
+    let digit_7 = *segments_3.first().unwrap();
 
-    // TODO Guess which digit it is
+    // 7 - 1 = a
+    let mapping_a = digit_7.find_different_segment(digit_1).unwrap();
 
-    result
+    // [segments_6] - 7 = c
+    let mapping_c = find_different_segment_in_vec(&segments_6, digit_7).unwrap();
+
+    // 1 - c = f
+    let mapping_f = digit_1.remaining_segment(vec![mapping_c]).unwrap();
+
+    // [segments_5] & 4 = d
+    let mapping_d = find_common_segment_in_vec(&segments_5, digit_4).unwrap();
+
+    // 4 - c - d - f = b
+    let mapping_b = digit_4
+        .remaining_segment(vec![mapping_c, mapping_d, mapping_f])
+        .unwrap();
+
+    let digit_all_minus_e_g = SegmentDisplay::from_position_negative(vec![
+        mapping_a, mapping_b, mapping_c, mapping_d, mapping_f,
+    ]);
+
+    // eg & [segments_5] = g
+    let mapping_g = find_common_segment_in_vec(&segments_5, &digit_all_minus_e_g).unwrap();
+
+    // eg - g = e
+    let mapping_e = digit_all_minus_e_g.remaining_segment(vec![mapping_g]).unwrap();
+
+    // First line - correct: 3 4 0 5 6 1 2
+    //                       3 4 2 2 0 1 5
+    //                       a b c d e f g
+
+    SegmentDisplayTransform {
+        segment_mapping: [
+            mapping_a, mapping_b, mapping_c, mapping_d, mapping_e, mapping_f, mapping_g,
+        ],
+    }
+}
+
+fn find_different_segment_in_vec(
+    segments: &Vec<&SegmentDisplay>,
+    from: &SegmentDisplay,
+) -> Option<usize> {
+    for segment in segments {
+        match (*segment).find_different_segment(from) {
+            Some(result) => return Some(result),
+            _ => (),
+        }
+    }
+
+    None
+}
+
+fn find_common_segment_in_vec(
+    segments: &Vec<&SegmentDisplay>,
+    from: &SegmentDisplay,
+) -> Option<usize> {
+    let mut current_common = segments[0].common_segments(from);
+
+    for window in segments.windows(2) {
+        current_common = window[0]
+            .common_segments(window[1])
+            .into_iter()
+            .filter(|c| current_common.contains(c))
+            .collect();
+    }
+
+    if current_common.len() == 1 {
+        Some(current_common[0])
+    } else {
+        None
+    }
 }
 
 pub fn main() -> Result<()> {
-    let file = File::open("input/input-8-2.txt")?;
+    let file = File::open("input/input-8-1.txt")?;
     let reader = BufReader::new(file);
 
     let mut count_part_1 = 0;
@@ -158,10 +284,14 @@ pub fn main() -> Result<()> {
         }
 
         let transform = infer_transform(samples);
+        println!("Transform: {:?}", transform);
 
         count_part_2 += output
             .into_iter()
+            .inspect(|_| println!("---"))
+            .inspect(|d| println!("Output: {:?}", d))
             .map(|d| transform.transform(d))
+            .inspect(|d| println!("Transformed: {:?}", d))
             .map(|d| d.to_digit())
             .fold(0, |acc, d| acc * 10 + d);
     }
