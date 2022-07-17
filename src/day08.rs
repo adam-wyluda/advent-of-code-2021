@@ -195,7 +195,9 @@ fn infer_transform(samples: Vec<SegmentDisplay>) -> SegmentDisplayTransform {
     let mapping_g = find_common_segment_in_vec(&segments_5, &digit_all_minus_e_g).unwrap();
 
     // eg - g = e
-    let mapping_e = digit_all_minus_e_g.remaining_segment(vec![mapping_g]).unwrap();
+    let mapping_e = digit_all_minus_e_g
+        .remaining_segment(vec![mapping_g])
+        .unwrap();
 
     SegmentDisplayTransform {
         segment_mapping: [

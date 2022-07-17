@@ -6,6 +6,7 @@ pub mod day05;
 pub mod day06;
 pub mod day07;
 pub mod day08;
+pub mod day09;
 
 use anyhow::Result;
 
@@ -25,5 +26,7 @@ fn main() -> Result<()> {
     println!("\n===== Day 07 =====");
     day07::main_first();
     println!("\n===== Day 08 =====");
-    day08::main()
+    day08::main();
+    println!("\n===== Day 09 =====");
+    day09::main()
 }
