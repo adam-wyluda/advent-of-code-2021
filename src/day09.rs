@@ -33,8 +33,10 @@ impl Heightmap {
     fn print_out_with_visited(&self, visited: &Vec<bool>) {
         for y in 0..self.height {
             for x in 0..self.width {
+                let point = self.point_at(x as isize, y as isize);
+
                 if visited[y * self.width + x] {
-                    print!("{} ", self.point_at(x as isize, y as isize));
+                    print!("{}🟢", point);
                 } else if x == 0
                     || x == self.width - 1
                     || y == 0
@@ -44,9 +46,13 @@ impl Heightmap {
                     || visited[(y + 1) * self.width + x]
                     || visited[y * self.width + x - 1]
                 {
-                    print!("{}x", self.point_at(x as isize, y as isize));
+                    if point == 9 {
+                        print!("{}🟠", point);
+                    } else {
+                        print!("{}🟡", point);
+                    }
                 } else {
-                    print!(". ");
+                    print!("{}🔵", point);
                 }
             }
             println!();
@@ -84,32 +90,31 @@ impl Heightmap {
             return 1;
         }
 
-        println!("( basin at {}, {}", x, y);
+        // println!("( basin at {}, {}", x, y);
 
         let mut size = 1;
 
-        if self.point_at(x as isize, y as isize - 1) == point + 1
-            && !visited[(y - 1) * self.width + x]
-        {
+        let near_point = self.point_at(x as isize, y as isize - 1);
+        if near_point > point && near_point != 9 && !visited[(y - 1) * self.width + x] {
             size += self.calculate_basin_size(visited, x, y - 1);
         }
-        if self.point_at(x as isize + 1, y as isize) == point + 1
-            && !visited[y * self.width + x + 1]
-        {
+
+        let near_point = self.point_at(x as isize + 1, y as isize);
+        if near_point > point && near_point != 9 && !visited[y * self.width + x + 1] {
             size += self.calculate_basin_size(visited, x + 1, y);
         }
-        if self.point_at(x as isize, y as isize + 1) == point + 1
-            && !visited[(y + 1) * self.width + x]
-        {
+
+        let near_point = self.point_at(x as isize, y as isize + 1);
+        if near_point > point && near_point != 9 && !visited[(y + 1) * self.width + x] {
             size += self.calculate_basin_size(visited, x, y + 1);
         }
-        if self.point_at(x as isize - 1, y as isize) == point + 1
-            && !visited[y * self.width + x - 1]
-        {
+
+        let near_point = self.point_at(x as isize - 1, y as isize);
+        if near_point > point && near_point != 9 && !visited[y * self.width + x - 1] {
             size += self.calculate_basin_size(visited, x - 1, y);
         }
 
-        println!(") basin at {}, {} = {}", x, y, size);
+        // println!(") basin at {}, {} = {}", x, y, size);
 
         size
     }
@@ -126,22 +131,23 @@ pub fn main() -> Result<()> {
     let mut basins = Vec::new();
     let mut visited = vec![false; heightmap.width * heightmap.height];
 
+    let mut basin_sum = 0;
+
     for y in (0..heightmap.height).map(|i| i as isize) {
         for x in (0..heightmap.width).map(|i| i as isize) {
             if heightmap.is_low_point(x, y) {
                 println!("Low point at {}, {}", x, y);
                 result_part_1 += heightmap.point_at(x, y) as u32 + 1;
 
-                basins.push(heightmap.calculate_basin_size(&mut visited, x as usize, y as usize));
-
-                if x == 4 && y == 50 {
-                    heightmap.print_out_with_visited(&visited);
-                }
-
-                visited.fill(false);
+                let basin_size =
+                    heightmap.calculate_basin_size(&mut visited, x as usize, y as usize);
+                basins.push(basin_size);
+                basin_sum += basin_size;
             }
         }
     }
+
+    heightmap.print_out_with_visited(&visited);
 
     basins.sort_by(|a, b| b.cmp(a));
     let result_part_2: u32 = basins.iter().take(3).product();
@@ -150,6 +156,22 @@ pub fn main() -> Result<()> {
     println!("The result for part 2 is: {}", result_part_2);
 
     println!("Basins: {:?}", basins);
+    println!("Basin sum: {}", basin_sum);
+
+    let heightmap_sum = heightmap
+        .values
+        .iter()
+        .fold(0 as u32, |a, b| a as u32 + *b as u32);
+    let nines_sum = heightmap
+        .values
+        .iter()
+        .filter(|v| **v == 9)
+        .fold(0 as u32, |a, b| a as u32 + *b as u32);
+    let other_sum = heightmap_sum - nines_sum;
+
+    println!("Heightmap sum: {}", heightmap_sum);
+    println!("Nines sum: {}", nines_sum);
+    println!("Other sum: {}", other_sum);
 
     Ok(())
 }
